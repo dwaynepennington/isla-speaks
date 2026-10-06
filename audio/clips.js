@@ -1,0 +1,22 @@
+window.ISLA_SPEAKS_CLIPS = {
+ "alldone": "audio/alldone.mp3",
+ "bath": "audio/bath.mp3",
+ "bluey": "audio/bluey.mp3",
+ "bryson": "audio/bryson.mp3",
+ "dada": "audio/dada.mp3",
+ "happy": "audio/happy.mp3",
+ "hungry": "audio/hungry.mp3",
+ "luca": "audio/luca.mp3",
+ "mama": "audio/mama.mp3",
+ "mamaw": "audio/mamaw.mp3",
+ "mickey": "audio/mickey.mp3",
+ "more": "audio/more.mp3",
+ "nap": "audio/nap.mp3",
+ "papaw": "audio/papaw.mp3",
+ "play": "audio/play.mp3",
+ "potty": "audio/potty.mp3",
+ "sad": "audio/sad.mp3",
+ "sick": "audio/sick.mp3",
+ "sleepy": "audio/sleepy.mp3",
+ "thirsty": "audio/thirsty.mp3"
+};

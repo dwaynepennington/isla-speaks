@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FFF6E9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Isla Speaks">
+<title>Isla Speaks</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=chillax@500,600,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="img/head.webp" alt="" width="200" height="200">
+    <span>Isla Speaks</span>
+  </div>
+  <button id="grownBtn" class="grown-btn" aria-label="Grown-ups settings. Press and hold.">
+    <svg viewBox="0 0 36 36" class="ring" aria-hidden="true"><circle cx="18" cy="18" r="16"/></svg>
+    <svg viewBox="0 0 24 24" class="gear" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+    <span class="grown-label">Grown-ups</span>
+  </button>
+</header>
+
+<button id="said" class="said" aria-live="polite" aria-label="Say it again">
+  <img id="saidImg" alt="" width="480" height="480" hidden>
+  <span id="saidText">Tap a picture to talk</span>
+  <svg id="saidAgain" class="again" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+</button>
+
+<main id="board" class="board" aria-label="Talking pictures"></main>
+
+<!-- Grown-ups corner -->
+<div id="grown" class="grown" hidden role="dialog" aria-modal="true" aria-labelledby="grownTitle">
+  <div class="grown-card">
+    <div class="grown-head">
+      <h2 id="grownTitle">Grown-ups Corner</h2>
+      <button id="grownClose" class="btn-done">Done</button>
+    </div>
+
+    <section class="g-sec">
+      <h3>What Isla said today</h3>
+      <ol id="log" class="log"></ol>
+      <p id="logEmpty" class="muted">Nothing yet today.</p>
+      <button id="clearLog" class="btn-soft">Clear today’s list</button>
+    </section>
+
+    <section class="g-sec">
+      <h3>Picture size</h3>
+      <div class="seg" id="sizeSeg" role="radiogroup" aria-label="Picture size">
+        <button data-size="large" role="radio">Large</button>
+        <button data-size="medium" role="radio">Medium</button>
+        <button data-size="small" role="radio">Small</button>
+      </div>
+    </section>
+
+    <section class="g-sec">
+      <h3>Voice</h3>
+      <label class="row"><span>Voice</span><select id="voiceSel"><option value="clip">Natural voice (recommended)</option></select></label>
+      <label class="row"><span>Speaking speed</span><input id="rate" type="range" min="0.7" max="1.2" step="0.05"></label>
+      <label class="row"><span>Soft chime before speaking</span><input id="chime" type="checkbox" class="switch"></label>
+      <label class="row"><span>Show words under pictures</span><input id="words" type="checkbox" class="switch"></label>
+    </section>
+
+    <section class="g-sec">
+      <h3>Pictures to show</h3>
+      <p class="muted">Turn off any pictures Isla doesn’t need yet. Fewer choices can be easier when she’s starting out.</p>
+      <div id="pickList" class="pick-list"></div>
+    </section>
+
+    <section class="g-sec tips">
+      <h3>Tips</h3>
+      <ul>
+        <li>When Isla taps a picture, answer her right away, even if you think she tapped it by accident. Quick answers teach her the buttons work.</li>
+        <li>Use the board yourself as you talk: tap “Bath time” as you say it. Showing her is the fastest way she learns.</li>
+        <li>The colored borders group the pictures: pink for signs, orange for needs, yellow for feelings, purple for rest, blue for things to do, and green for people.</li>
+        <li>Keep pictures in the same spots so she can find them by memory. Hide pictures rather than moving them.</li>
+        <li>To keep her inside the app on an iPad or iPhone, turn on Guided Access (Settings, Accessibility, Guided Access), then triple-click the side or home button.</li>
+      </ul>
+    </section>
+    <p id="saveNote" class="muted center">Settings and today’s list are saved on this device.</p>
+  </div>
+</div>
+
+<script src="audio/clips.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
