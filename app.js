@@ -42,10 +42,12 @@
   var store = null;
   try { store = window.localStorage; store.setItem('__t', '1'); store.removeItem('__t'); } catch (e) { store = null; }
 
-  var defaults = { size: 'medium', rate: 1, chime: false, words: true, voice: 'clip', hidden: {}, log: [], logDay: '' };
+  var defaults = { size: 'medium', rate: 1, chime: false, words: true, voice: 'clip', hidden: {}, custom: {}, log: [], logDay: '' };
   var S = Object.assign({}, defaults);
   try { if (store) Object.assign(S, JSON.parse(store.getItem(KEY) || '{}')); } catch (e) {}
-  function save() { try { if (store) store.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  if (!S.custom) S.custom = {};
+  function save() { try { if (store) store.setItem(KEY, JSON.stringify(S)); return true; } catch (e) { return false; } }
+  function pic(k) { return S.custom[k] || ('img/' + k + '.webp'); }
 
   function today() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   if (S.logDay !== today()) { S.log = []; S.logDay = today(); save(); }
@@ -127,7 +129,7 @@
         b.className = 'tile c-' + g.id;
         b.dataset.key = it[0];
         b.setAttribute('aria-label', it[2]);
-        b.innerHTML = '<img src="img/' + it[0] + '.webp" alt="" width="480" height="480"><span class="lbl">' + it[1] + '</span>';
+        b.innerHTML = '<img src="' + pic(it[0]) + '" alt="" width="480" height="480"><span class="lbl">' + it[1] + '</span>';
         grid.appendChild(b);
       });
     });
@@ -157,7 +159,7 @@
   function showSaid(item) {
     lastItem = item;
     saidBtn.classList.remove('idle');
-    saidImg.src = 'img/' + item.key + '.webp'; saidImg.hidden = false; saidAgain.hidden = false;
+    saidImg.src = pic(item.key); saidImg.hidden = false; saidAgain.hidden = false;
     saidText.textContent = item.say;
     saidBtn.classList.remove('pulse'); void saidBtn.offsetWidth; saidBtn.classList.add('pulse');
   }
@@ -186,7 +188,7 @@
     $('logEmpty').hidden = todays.length > 0;
     todays.forEach(function (x) {
       var li = document.createElement('li');
-      li.innerHTML = '<img src="img/' + x.k + '.webp" alt=""><span>' + ITEMS[x.k].say + '</span><time>' + fmtTime(x.t) + '</time>';
+      li.innerHTML = '<img src="' + pic(x.k) + '" alt=""><span>' + ITEMS[x.k].say + '</span><time>' + fmtTime(x.t) + '</time>';
       log.appendChild(li);
     });
     Array.prototype.forEach.call(document.querySelectorAll('#sizeSeg button'), function (b) { b.setAttribute('aria-checked', b.dataset.size === S.size ? 'true' : 'false'); });
@@ -194,9 +196,12 @@
     fillVoices();
     var pl = $('pickList'); pl.innerHTML = '';
     GROUPS.forEach(function (g) { g.items.forEach(function (it) {
-      var l = document.createElement('label'); l.className = 'pick';
-      l.innerHTML = '<img src="img/' + it[0] + '.webp" alt=""><span>' + it[1] + '</span><input type="checkbox" data-key="' + it[0] + '"' + (S.hidden[it[0]] ? '' : ' checked') + '>';
-      pl.appendChild(l);
+      var row = document.createElement('div'); row.className = 'pick';
+      row.innerHTML = '<img src="' + pic(it[0]) + '" alt=""><span>' + it[1] + '</span>' +
+        '<label class="pick-photo">Photo<input type="file" accept="image/*" data-photo="' + it[0] + '" hidden></label>' +
+        (S.custom[it[0]] ? '<button class="pick-reset" data-reset="' + it[0] + '" aria-label="Use the cartoon again">Cartoon</button>' : '') +
+        '<input type="checkbox" aria-label="Show ' + it[1] + '" data-key="' + it[0] + '"' + (S.hidden[it[0]] ? '' : ' checked') + '>';
+      pl.appendChild(row);
     }); });
   }
   function fillVoices() {
@@ -225,7 +230,35 @@
   $('chime').addEventListener('change', function () { S.chime = this.checked; save(); });
   $('words').addEventListener('change', function () { S.words = this.checked; save(); });
   $('voiceSel').addEventListener('change', function () { S.voice = this.value; save(); speak(ITEMS.happy); });
+  function squarePhoto(file, cb) {
+    var url = URL.createObjectURL(file);
+    var im = new Image();
+    im.onload = function () {
+      var side = Math.min(im.naturalWidth, im.naturalHeight);
+      var sx = (im.naturalWidth - side) / 2, sy = (im.naturalHeight - side) / 2;
+      var c = document.createElement('canvas'); c.width = c.height = 480;
+      c.getContext('2d').drawImage(im, sx, sy, side, side, 0, 0, 480, 480);
+      URL.revokeObjectURL(url);
+      try { cb(c.toDataURL('image/jpeg', 0.82)); } catch (err) { cb(null); }
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    im.src = url;
+  }
+  $('pickList').addEventListener('click', function (e) {
+    var r = e.target.closest('[data-reset]'); if (!r) return;
+    delete S.custom[r.dataset.reset]; save(); fillGrown();
+  });
   $('pickList').addEventListener('change', function (e) {
+    var pk = e.target.dataset.photo;
+    if (pk && e.target.files && e.target.files[0]) {
+      squarePhoto(e.target.files[0], function (data) {
+        if (!data) { alert('That picture could not be used. Please try another one.'); return; }
+        var prev = S.custom[pk]; S.custom[pk] = data;
+        if (!save() && store) { if (prev) S.custom[pk] = prev; else delete S.custom[pk]; alert('This device is out of room for more photos. Try switching one back to the cartoon first.'); }
+        fillGrown();
+      });
+      return;
+    }
     var k = e.target.dataset.key; if (!k) return;
     if (e.target.checked) delete S.hidden[k]; else S.hidden[k] = true;
     save();
